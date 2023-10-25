@@ -10,4 +10,12 @@ export class UserService {
     create(createUserDto: CreateUserDto) {
         return this.prisma.user.create({ data: createUserDto });
     }
+
+    async getUserById(id: string) {
+        return this.prisma.user.findFirst({
+            where: {
+                id: +id
+            }
+        })
+    }
 }
