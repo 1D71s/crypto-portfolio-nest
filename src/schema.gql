@@ -27,6 +27,7 @@ type Query {
   getUserById(id: String!): UserEntity!
   getAllUsers: [UserEntity!]!
   login(input: LoginAuthInput!): TokenEntity!
+  getme: UserEntity!
   getPrice: [PriceData!]!
 }
 
