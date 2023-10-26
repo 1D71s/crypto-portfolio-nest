@@ -9,12 +9,24 @@ type UserEntity {
   password: String!
 }
 
+type PriceData {
+  time: DateTime!
+  open: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   getUserById(id: String!): UserEntity!
+  getAllUsers: [UserEntity!]!
+  getPrice: [PriceData!]!
 }
 
 type Mutation {
-  createUser(input: CreateUserDto!): UserEntity!
+  registration(input: CreateUserDto!): UserEntity!
 }
 
 input CreateUserDto {

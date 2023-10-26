@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
 import { PortfolioService } from './portfolio.service';
-import { PortfolioController } from './portfolio.controller';
+import { PriceModule } from 'src/price/price.module';
+import { PortfolioResolver } from './portfolio.resolver';
 
 @Module({
-  controllers: [PortfolioController],
-  providers: [PortfolioService],
+  controllers: [],
+  providers: [PortfolioService, PortfolioResolver],
+  imports: [
+    PriceModule
+  ]
 })
 export class PortfolioModule {}
