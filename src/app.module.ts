@@ -8,17 +8,18 @@ import { PriceModule } from './price/price.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [
-    UserModule,
-    AuthModule,
-    PortfolioModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-    }),
-    PriceModule
-  ],
-  controllers: [],
-  providers: [],
+    imports: [
+        UserModule,
+        AuthModule,
+        PortfolioModule,
+        GraphQLModule.forRoot<ApolloDriverConfig>({
+            driver: ApolloDriver,
+            autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+            context: ({ req, res }) => ({ req, res })
+        }),
+        PriceModule
+    ],
+    controllers: [],
+    providers: [],
 })
 export class AppModule { }
