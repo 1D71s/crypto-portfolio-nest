@@ -4,8 +4,9 @@ import { PortfolioModule } from './portfolio/portfolio.module';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
-import { PriceModule } from './price/price.module';
 import { AuthModule } from './auth/auth.module';
+import { StatisticsModule } from './statistics/statistics.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
     imports: [
@@ -17,7 +18,8 @@ import { AuthModule } from './auth/auth.module';
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
             context: ({ req, res }) => ({ req, res })
         }),
-        PriceModule
+        StatisticsModule,
+        TransactionModule
     ],
     controllers: [],
     providers: [],

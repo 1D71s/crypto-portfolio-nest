@@ -9,6 +9,14 @@ type UserEntity {
   password: String!
 }
 
+type MessageEntity {
+  message: String!
+}
+
+type TokenEntity {
+  token: String!
+}
+
 type PriceData {
   time: DateTime!
   open: Float!
@@ -19,15 +27,13 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type TokenEntity {
-  token: String!
-}
-
 type Query {
   getUserById(id: String!): UserEntity!
   getAllUsers: [UserEntity!]!
   login(input: LoginAuthInput!): TokenEntity!
   getme: UserEntity!
+  getAllUserPortfolio: MessageEntity!
+  getOnePortfolio: MessageEntity!
   getPrice: [PriceData!]!
 }
 
@@ -38,6 +44,9 @@ input LoginAuthInput {
 
 type Mutation {
   registration(input: CreateAuthInput!): TokenEntity!
+  createPortfolio: MessageEntity!
+  updatePortfolio: MessageEntity!
+  deletePortfolio: MessageEntity!
 }
 
 input CreateAuthInput {

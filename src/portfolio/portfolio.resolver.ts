@@ -1,19 +1,36 @@
+import { MessageEntity } from 'src/common/global-endity/message.endity';
 import { PortfolioService } from './portfolio.service';
-import { PriceService } from 'src/price/price.service';
-import { Query, Resolver } from '@nestjs/graphql';
-import { PriceData } from './endity/history.price';
+import { Resolver, Mutation, Query } from '@nestjs/graphql';
 
 
 @Resolver()
 export class PortfolioResolver {
-    constructor(
-        private readonly portfolioService: PortfolioService,
-        private readonly priceService: PriceService
-    ) {}
+
+    constructor(private readonly portfolioService: PortfolioService) { }
     
-    @Query(() => [PriceData])
-    async getPrice(): Promise<PriceData[]> {
-        return this.priceService.getHistoryPrice();
+    @Mutation(() => MessageEntity, { name: 'createPortfolio' })
+    createPortfolio() {
+        
+    }
+
+    @Query(() => MessageEntity)
+    getAllUserPortfolio() {
+
+    }
+
+    @Query(() => MessageEntity)
+    getOnePortfolio() {
+        
+    }
+
+    @Mutation(() => MessageEntity, { name: 'updatePortfolio' })
+    updatePortfolio() {
+        
+    }
+
+    @Mutation(() => MessageEntity, { name: 'deletePortfolio' })
+    deletePortfolio() {
+        
     }
 }
 

@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthInput } from 'src/auth/dto/register-auth.input';
-import { PrismaService } from 'src/prisma';
+import { PrismaService } from 'src/common/prisma/prisma';
 import { User } from './types';
 
 @Injectable()
