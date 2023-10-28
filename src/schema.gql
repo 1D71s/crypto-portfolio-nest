@@ -13,8 +13,10 @@ type MessageEntity {
   message: String!
 }
 
-type OnePortfolioEntity {
+type PortfolioEntity {
+  id: Float!
   name: String!
+  authorId: Float!
 }
 
 type TokenEntity {
@@ -36,7 +38,7 @@ type Query {
   getAllUsers: [UserEntity!]!
   login(input: LoginAuthInput!): TokenEntity!
   getme: UserEntity!
-  getAllUserPortfolio: MessageEntity!
+  getAllUserPortfolio: [PortfolioEntity!]!
   getOnePortfolio: MessageEntity!
   getPrice: [PriceData!]!
 }
@@ -48,9 +50,9 @@ input LoginAuthInput {
 
 type Mutation {
   registration(input: CreateAuthInput!): TokenEntity!
-  createPortfolio(input: CreatePortfolioInput!): OnePortfolioEntity!
+  createPortfolio(input: CreatePortfolioInput!): PortfolioEntity!
   updatePortfolio: MessageEntity!
-  deletePortfolio: MessageEntity!
+  deletePortfolio(input: IdPortfolioInput!): MessageEntity!
 }
 
 input CreateAuthInput {
@@ -61,4 +63,8 @@ input CreateAuthInput {
 
 input CreatePortfolioInput {
   name: String!
+}
+
+input IdPortfolioInput {
+  id: Float!
 }

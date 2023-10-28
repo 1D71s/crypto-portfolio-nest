@@ -6,7 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginAuthInput } from './dto/login-auth.input';
 import { Response, Request } from 'express';
 import { User } from 'src/user/types';
-import { Token } from './types';
+import { TokenEntity } from './entity/token.entity';
+
 
 @Injectable()
 export class AuthService {
@@ -38,7 +39,7 @@ export class AuthService {
         }
     }
 
-    public async login(dto: LoginAuthInput, res: Response): Promise<Token> {
+    public async login(dto: LoginAuthInput, res: Response): Promise<TokenEntity> {
         try {
             const user = await this.validateUser(dto);
             const token = await this.generateToken(user);
@@ -53,7 +54,7 @@ export class AuthService {
     }
 
 
-    public async registration(dto: CreateAuthInput): Promise<Token> {
+    public async registration(dto: CreateAuthInput): Promise<TokenEntity> {
         try {
             const candidate = await this.userService.getUserByEmail(dto.email);
 
@@ -72,7 +73,7 @@ export class AuthService {
         }
     }
 
-    private async generateToken(user: any): Promise<Token> {
+    private async generateToken(user: any): Promise<TokenEntity> {
         try {
             const payload = { id: user.id };
             const token = this.jwtService.sign(payload);
