@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { PrismaService } from 'src/common/prisma/prisma';
 import { MessageEntity } from '../common/global-endity/message.endity';
 import { TransactionService } from 'src/transaction/transaction.service';
+import { CreatePortfolioInput } from './dto/create-portfolio-dto';
 
 @Injectable()
 export class PortfolioService {
@@ -11,9 +12,9 @@ export class PortfolioService {
         private readonly transactionService: TransactionService
     ) { }
 
-    public async createPortfolio() {
+    public async createPortfolio(dto: CreatePortfolioInput, userId: number) {
         try {
-            
+            console.log(dto, userId)
         } catch (error) {
             throw new InternalServerErrorException('Something went wrong wehen creating the portfolio!');
         }
@@ -23,7 +24,7 @@ export class PortfolioService {
         try {
             
         } catch (error) {
-            
+            throw new InternalServerErrorException('An error occurred while retrieving the portfolios!');
         }
     }
 
@@ -31,7 +32,7 @@ export class PortfolioService {
         try {
             
         } catch (error) {
-            
+            throw new InternalServerErrorException('An error occurred while retrieving the portfolio!');
         }
     }
 
@@ -52,6 +53,9 @@ export class PortfolioService {
             if (!portfolioToDelete) {
                 throw new NotFoundException('Portfolio not found');
             }
+
+            //delete portfolio's transactions
+            console.log("delete portfolio's transactions")
 
             await this.prisma.portfolio.delete({
                 where: {

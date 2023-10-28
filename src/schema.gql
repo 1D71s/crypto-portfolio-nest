@@ -13,6 +13,10 @@ type MessageEntity {
   message: String!
 }
 
+type OnePortfolioEntity {
+  name: String!
+}
+
 type TokenEntity {
   token: String!
 }
@@ -44,7 +48,7 @@ input LoginAuthInput {
 
 type Mutation {
   registration(input: CreateAuthInput!): TokenEntity!
-  createPortfolio: MessageEntity!
+  createPortfolio(input: CreatePortfolioInput!): OnePortfolioEntity!
   updatePortfolio: MessageEntity!
   deletePortfolio: MessageEntity!
 }
@@ -53,4 +57,8 @@ input CreateAuthInput {
   email: String!
   name: String!
   password: String!
+}
+
+input CreatePortfolioInput {
+  name: String!
 }
