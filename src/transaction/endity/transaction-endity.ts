@@ -22,5 +22,8 @@ export class TransactionEntity {
     readonly date: string;
 
     @Field()
+    readonly authorId: number;
+
+    @Field()
     readonly portfolioId: number;
 }

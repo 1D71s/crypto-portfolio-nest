@@ -34,6 +34,9 @@ export class PortfolioService {
             const portfolios = await this.prisma.portfolio.findMany({
                 where: {
                     authorId: +userId
+                },
+                include: {
+                    transactions: true
                 }
             })
 

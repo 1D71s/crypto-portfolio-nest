@@ -8,7 +8,7 @@ export class TransactionService {
     
     constructor( private readonly prisma: PrismaService ) {}
 
-    public async addTransaction(dto: AddTransactionInput) {
+    public async addTransaction(dto: AddTransactionInput, userId: number) {
         try {
 
             const portfolio = await this.prisma.portfolio.findFirst({ where: { id: +dto.portfolioId } })
@@ -24,6 +24,7 @@ export class TransactionService {
                     price: dto.price,
                     spent: dto.spent,
                     date: dto.date,
+                    authorId: +userId,
                     portfolioId: dto.portfolioId
                 }
             });
@@ -39,15 +40,24 @@ export class TransactionService {
         try {
             
         } catch (error) {
-            throw new error;
+            throw error;
         }
     }
 
-    public async getOneTransaction() {
+    public async getOneTransaction(transactionId: number) {
         try {
-            
+            const transaction = await this.prisma.transaction.findUnique({
+                where: { id: +transactionId },
+            });
+
+            if (!transaction) {
+                throw new NotFoundException('Transaction not found');
+            }
+
+            return transaction
+
         } catch (error) {
-            throw new error;
+            throw error;
         }
     }
 
@@ -55,19 +65,13 @@ export class TransactionService {
         try {
             
         } catch (error) {
-            throw new error;
+            throw error;
         }
     }
 
     public async deleteTransaction(id: number) {
         try {
-            const transactionToDelete = await this.prisma.transaction.findUnique({
-                where: { id: +id },
-            });
-
-            if (!transactionToDelete) {
-                throw new NotFoundException('Transaction not found');
-            }
+            const transactionToDelete = await this.getOneTransaction(id);
 
             await this.prisma.transaction.delete({
                 where: {
@@ -77,7 +81,7 @@ export class TransactionService {
 
             return { message: 'Transaction has been deleted!' }
         } catch (error) {
-            throw new error;
+            throw error;
         }
     }
 }

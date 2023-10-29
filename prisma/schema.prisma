@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id         Int         @id @default(autoincrement())
-  email      String      @unique
-  name       String?
-  password   String
-  portfolios Portfolio[] @relation("author")
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  name         String?
+  password     String
+  portfolios   Portfolio[]   @relation("author")
+  transactions Transaction[] @relation("author")
 }
 
 model Portfolio {
@@ -30,6 +31,8 @@ model Transaction {
   price       Int
   spent       Int
   date        DateTime
+  authorId    Int
+  author      User      @relation("author", fields: [authorId], references: [id])
   portfolioId Int
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
 }
