@@ -1,10 +1,9 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma';
-import { MessageEntity } from '../common/global-endity/message.endity';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { CreatePortfolioInput } from './dto/create-portfolio-dto';
 import { UpdatePortfolioInput } from './dto/update-portfolio-dto';
-import { PortfolioEntity } from './endity/portfolio-endity';
+
 
 @Injectable()
 export class PortfolioService {
@@ -14,7 +13,7 @@ export class PortfolioService {
         private readonly transactionService: TransactionService
     ) { }
 
-    public async createPortfolio(dto: CreatePortfolioInput, userId: number): Promise<PortfolioEntity> {
+    public async createPortfolio(dto: CreatePortfolioInput, userId: number) {
         try {
             const portfolio = await this.prisma.portfolio.create({
                 data: {
@@ -26,18 +25,22 @@ export class PortfolioService {
             return portfolio
             
         } catch (error) {
-            throw new InternalServerErrorException('Something went wrong wehen creating the portfolio!');
+            throw error;
         }
     }
 
-    public async getAllUserPortfolio(): Promise<PortfolioEntity[]> {
+    public async getAllUserPortfolio(userId: number) {
         try {
-            const portfolios = await this.prisma.portfolio.findMany()
+            const portfolios = await this.prisma.portfolio.findMany({
+                where: {
+                    authorId: +userId
+                }
+            })
 
             return portfolios
 
         } catch (error) {
-            throw new InternalServerErrorException('An error occurred while retrieving the portfolios!');
+            throw error;
         }
     }
 
@@ -46,55 +49,77 @@ export class PortfolioService {
             const portfolio = await this.prisma.portfolio.findFirst({
                 where: {
                     id: +portfolioId
+                },
+                include: {
+                    transactions: true
                 }
             })
 
+            if (!portfolio) {
+                throw new NotFoundException('Portfolio not found');
+            }
+
             return portfolio
+
         } catch (error) {
-            throw new InternalServerErrorException('An error occurred while retrieving the portfolio!');
+            throw error;
         }
     }
 
-    public async editPortfolio(dto: UpdatePortfolioInput, portfolioId: number) {
+    public async editPortfolio(dto: UpdatePortfolioInput, userId: number) {
         try {
-            const portfolio = await this.prisma.portfolio.update({
+
+            const portfolio = await this.getOnePortfolio(dto.id)
+
+            if (!portfolio) {
+                throw new NotFoundException('Portfolio not found');
+            }
+
+            if (userId !== portfolio.authorId) {
+                throw new UnauthorizedException('No access!!');
+            }
+
+            return this.prisma.portfolio.update({
                 where: {
-                    id: +portfolioId
+                    id: +dto.id
                 },
                 data: {
                     name: dto.name
                 }
             })
 
-            return portfolio
         } catch (error) {
-            throw new InternalServerErrorException('Something went wrong when editing the portfolio!');
+            throw error;
         }
     }
 
-    public async deletePortfolio(id: number): Promise<MessageEntity> {
+    public async deletePortfolio(portfolioId: number, userId: number) {
         try {
-            const portfolioToDelete = await this.prisma.portfolio.findUnique({
-                where: { id: +id },
-            });
+            const portfolioToDelete = await this.getOnePortfolio(portfolioId)
 
             if (!portfolioToDelete) {
                 throw new NotFoundException('Portfolio not found');
             }
 
-            //delete portfolio's transactions
-            console.log("delete portfolio's transactions")
+            if (portfolioToDelete.authorId !== userId) {
+                throw new UnauthorizedException('No access!!');
+            }
+
+            const deleteTransactionPromises = portfolioToDelete.transactions.map((transaction) =>
+                this.transactionService.deleteTransaction(transaction.id)
+            );
+            await Promise.all(deleteTransactionPromises);
 
             await this.prisma.portfolio.delete({
                 where: {
-                    id: portfolioToDelete.id
+                    id: +portfolioId
                 }
             })
 
             return { message: 'Portfolio has been deleted!' }
-    
+
         } catch (error) {
-            throw new InternalServerErrorException('Something went wrong when deleting the portfolio!');
+            throw error;
         }
     }
 }

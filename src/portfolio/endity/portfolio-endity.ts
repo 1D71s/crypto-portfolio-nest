@@ -1,4 +1,5 @@
 import { ObjectType, Field } from "@nestjs/graphql"
+import { TransactionEntity } from "src/transaction/endity/transaction-endity"
 
 @ObjectType()
 export class PortfolioEntity {
@@ -11,4 +12,7 @@ export class PortfolioEntity {
 
 	@Field()
 	authorId: number
+
+	@Field(() => [TransactionEntity])
+	transactions: TransactionEntity[]
 }

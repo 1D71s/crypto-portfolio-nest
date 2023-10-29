@@ -30,6 +30,6 @@ model Transaction {
   price       Int
   spent       Int
   date        DateTime
-  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
   portfolioId Int
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
 }

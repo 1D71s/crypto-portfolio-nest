@@ -1,29 +1,53 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { MessageEntity } from 'src/common/global-endity/message.endity';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma';
+import { AddTransactionInput } from './dto/add-transaction';
+
 
 @Injectable()
 export class TransactionService {
     
-    constructor(private readonly prisma: PrismaService) {}
+    constructor( private readonly prisma: PrismaService ) {}
 
-    public async addTrandaction() {
+    public async addTransaction(dto: AddTransactionInput) {
         try {
+
+            const portfolio = await this.prisma.portfolio.findFirst({ where: { id: +dto.portfolioId } })
             
+            if (!portfolio) {
+                throw new NotFoundException('Portfolio not found');
+            }
+            
+            const transaction = await this.prisma.transaction.create({
+                data: {
+                    coin: dto.coin,
+                    operation: dto.operation,
+                    price: dto.price,
+                    spent: dto.spent,
+                    date: dto.date,
+                    portfolioId: dto.portfolioId
+                }
+            });
+
+            return transaction;
+
         } catch (error) {
-            throw new InternalServerErrorException('Something went wrong when adding the transaction!');
+            throw error;
         }
     }
 
     public async getAllTransaction() {
-        
+        try {
+            
+        } catch (error) {
+            throw new error;
+        }
     }
 
     public async getOneTransaction() {
         try {
             
         } catch (error) {
-            
+            throw new error;
         }
     }
 
@@ -31,11 +55,11 @@ export class TransactionService {
         try {
             
         } catch (error) {
-            
+            throw new error;
         }
     }
 
-    public async deleteTransaction(id: number): Promise<MessageEntity> {
+    public async deleteTransaction(id: number) {
         try {
             const transactionToDelete = await this.prisma.transaction.findUnique({
                 where: { id: +id },
@@ -53,7 +77,7 @@ export class TransactionService {
 
             return { message: 'Transaction has been deleted!' }
         } catch (error) {
-            throw new InternalServerErrorException('Something went wrong when deleting the transaction!');
+            throw new error;
         }
     }
 }

@@ -8,6 +8,7 @@ import { PortfolioEntity } from './endity/portfolio-endity';
 import { User } from 'src/common/decorators/get-user';
 import { UserEntity } from 'src/user/entity/user.entity';
 import { IdPortfolioInput } from './dto/id-portfolio-dto';
+import { UpdatePortfolioInput } from './dto/update-portfolio-dto';
 
 
 @Resolver()
@@ -23,26 +24,26 @@ export class PortfolioResolver {
 
     @UseGuards(AuthGuard)
     @Query(() => [PortfolioEntity])
-    getAllUserPortfolio() {
-        return this.portfolioService.getAllUserPortfolio()
+    getAllUserPortfolio(@User() user: UserEntity) {
+        return this.portfolioService.getAllUserPortfolio(+user.id)
     }
 
     @UseGuards(AuthGuard)
-    @Query(() => MessageEntity)
-    getOnePortfolio() {
-        
+    @Query(() => PortfolioEntity)
+    getOnePortfolio(@Args('input') dto: IdPortfolioInput) {
+        return this.portfolioService.getOnePortfolio(dto.id)
+    }
+
+    @UseGuards(AuthGuard)
+    @Mutation(() => PortfolioEntity)
+    updatePortfolio(@User() user: UserEntity, @Args('input') dto: UpdatePortfolioInput) {
+        return this.portfolioService.editPortfolio(dto, +user.id)
     }
 
     @UseGuards(AuthGuard)
     @Mutation(() => MessageEntity)
-    updatePortfolio() {
-        
-    }
-
-    @UseGuards(AuthGuard)
-    @Mutation(() => MessageEntity)
-    deletePortfolio(@Args('input') input: IdPortfolioInput) {
-        return this.portfolioService.deletePortfolio(input.id)
+    deletePortfolio(@User() user: UserEntity, @Args('input') dto: IdPortfolioInput) {
+        return this.portfolioService.deletePortfolio(dto.id, +user.id)
     }
 }
 

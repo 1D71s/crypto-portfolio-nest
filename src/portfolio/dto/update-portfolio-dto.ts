@@ -6,5 +6,9 @@ export class UpdatePortfolioInput {
 
     @IsNotEmpty()
     @Field()
+    readonly id: number;
+
+    @IsNotEmpty()
+    @Field()
     readonly name: string;
 }

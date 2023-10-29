@@ -13,10 +13,21 @@ type MessageEntity {
   message: String!
 }
 
+type TransactionEntity {
+  id: Float!
+  coin: String!
+  operation: Boolean!
+  price: Float!
+  spent: Float!
+  date: String!
+  portfolioId: Float!
+}
+
 type PortfolioEntity {
   id: Float!
   name: String!
   authorId: Float!
+  transactions: [TransactionEntity!]!
 }
 
 type TokenEntity {
@@ -39,7 +50,7 @@ type Query {
   login(input: LoginAuthInput!): TokenEntity!
   getme: UserEntity!
   getAllUserPortfolio: [PortfolioEntity!]!
-  getOnePortfolio: MessageEntity!
+  getOnePortfolio(input: IdPortfolioInput!): PortfolioEntity!
   getPrice: [PriceData!]!
 }
 
@@ -48,11 +59,17 @@ input LoginAuthInput {
   password: String!
 }
 
+input IdPortfolioInput {
+  id: Float!
+}
+
 type Mutation {
   registration(input: CreateAuthInput!): TokenEntity!
   createPortfolio(input: CreatePortfolioInput!): PortfolioEntity!
-  updatePortfolio: MessageEntity!
+  updatePortfolio(input: UpdatePortfolioInput!): PortfolioEntity!
   deletePortfolio(input: IdPortfolioInput!): MessageEntity!
+  addTransaction(input: AddTransactionInput!): TransactionEntity!
+  deleteTransaction(input: IdInput!): MessageEntity!
 }
 
 input CreateAuthInput {
@@ -65,6 +82,20 @@ input CreatePortfolioInput {
   name: String!
 }
 
-input IdPortfolioInput {
+input UpdatePortfolioInput {
+  id: Float!
+  name: String!
+}
+
+input AddTransactionInput {
+  coin: String!
+  operation: Boolean!
+  price: Float!
+  spent: Float!
+  date: String!
+  portfolioId: Float!
+}
+
+input IdInput {
   id: Float!
 }

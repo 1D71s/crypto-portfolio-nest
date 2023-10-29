@@ -12,7 +12,7 @@ export class UserService {
         try {
             return this.prisma.user.create({ data: createUserDto });
         } catch (error) {
-            throw new InternalServerErrorException('Error with creating user');
+            throw error;
         }
     }
 
@@ -24,7 +24,7 @@ export class UserService {
     
             return user;
         } catch (error) {
-            throw new InternalServerErrorException('Error with searching user');
+            throw error;
         }
     }
     
@@ -38,7 +38,7 @@ export class UserService {
             return user
 
         } catch (error) {
-            throw new UnauthorizedException({ message: 'Error with search user!' });
+            throw error;
         }
     }
 
@@ -53,7 +53,7 @@ export class UserService {
             return users;
 
         } catch (error) {
-            throw new UnauthorizedException({ message: 'Error with search users!' });
+            throw error;
         }
     }
 }
