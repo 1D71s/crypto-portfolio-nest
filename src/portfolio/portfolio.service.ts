@@ -109,7 +109,7 @@ export class PortfolioService {
             }
 
             const deleteTransactionPromises = portfolioToDelete.transactions.map((transaction) =>
-                this.transactionService.deleteTransaction(transaction.id)
+                this.transactionService.deleteTransaction(transaction.id, userId)
             );
             await Promise.all(deleteTransactionPromises);
 

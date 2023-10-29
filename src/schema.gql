@@ -53,6 +53,7 @@ type Query {
   getAllUserPortfolio: [PortfolioEntity!]!
   getOnePortfolio(input: IdPortfolioInput!): PortfolioEntity!
   getPrice: [PriceData!]!
+  getOneTransaction(input: IdInput!): TransactionEntity!
 }
 
 input LoginAuthInput {
@@ -64,12 +65,17 @@ input IdPortfolioInput {
   id: Float!
 }
 
+input IdInput {
+  id: Float!
+}
+
 type Mutation {
   registration(input: CreateAuthInput!): TokenEntity!
   createPortfolio(input: CreatePortfolioInput!): PortfolioEntity!
   updatePortfolio(input: UpdatePortfolioInput!): PortfolioEntity!
   deletePortfolio(input: IdPortfolioInput!): MessageEntity!
   addTransaction(input: AddTransactionInput!): TransactionEntity!
+  editTransaction(input: UpdateTransactionInput!): TransactionEntity!
   deleteTransaction(input: IdInput!): MessageEntity!
 }
 
@@ -97,6 +103,11 @@ input AddTransactionInput {
   portfolioId: Float!
 }
 
-input IdInput {
+input UpdateTransactionInput {
   id: Float!
+  coin: String!
+  operation: Boolean!
+  price: Float!
+  spent: Float!
+  date: String!
 }
