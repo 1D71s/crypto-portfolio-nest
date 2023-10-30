@@ -4,7 +4,7 @@ import { Resolver, Mutation, Query, Args } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/common/guards/auth-guards';
 import { CreatePortfolioInput } from './dto/create-portfolio-dto';
-import { PortfolioEntity } from './endity/portfolio-endity';
+import { PortfolioEntity, PortfolioWithTransactionEntity } from './endity/portfolio-with-transacion-endity';
 import { User } from 'src/common/decorators/get-user';
 import { UserEntity } from 'src/user/entity/user.entity';
 import { IdPortfolioInput } from './dto/id-portfolio-dto';
@@ -23,13 +23,13 @@ export class PortfolioResolver {
     }
 
     @UseGuards(AuthGuard)
-    @Query(() => [PortfolioEntity])
+    @Query(() => [PortfolioWithTransactionEntity])
     getAllUserPortfolio(@User() user: UserEntity) {
         return this.portfolioService.getAllUserPortfolio(+user.id)
     }
 
     @UseGuards(AuthGuard)
-    @Query(() => PortfolioEntity)
+    @Query(() => PortfolioWithTransactionEntity)
     getOnePortfolio(@Args('input') dto: IdPortfolioInput) {
         return this.portfolioService.getOnePortfolio(dto.id)
     }

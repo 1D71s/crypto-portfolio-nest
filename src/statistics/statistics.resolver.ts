@@ -8,7 +8,7 @@ export class StatisticsResolver {
     constructor(private readonly statisticsService: StatisticsService) { }
     
     @Query(() => [PriceData])
-    async getPrice(): Promise<PriceData[]> {
-        return this.statisticsService.getHistoryPrice();
+    async getPrice() {
+        return this.statisticsService.getHistoryPriceOfDay();
     }
 }

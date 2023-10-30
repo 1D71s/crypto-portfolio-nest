@@ -3,6 +3,9 @@ import { PrismaService } from 'src/common/prisma/prisma';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { CreatePortfolioInput } from './dto/create-portfolio-dto';
 import { UpdatePortfolioInput } from './dto/update-portfolio-dto';
+import { PortfolioEntity } from './endity/portfolio-endity';
+import { PortfolioWithTransactionEntity } from './endity/portfolio-with-transacion-endity';
+import { MessageEntity } from 'src/common/global-endity/message.endity';
 
 
 @Injectable()
@@ -13,7 +16,7 @@ export class PortfolioService {
         private readonly transactionService: TransactionService
     ) { }
 
-    public async createPortfolio(dto: CreatePortfolioInput, userId: number) {
+    public async createPortfolio(dto: CreatePortfolioInput, userId: number): Promise<PortfolioEntity> {
         try {
             const portfolio = await this.prisma.portfolio.create({
                 data: {
@@ -29,7 +32,7 @@ export class PortfolioService {
         }
     }
 
-    public async getAllUserPortfolio(userId: number) {
+    public async getAllUserPortfolio(userId: number): Promise<PortfolioWithTransactionEntity[]> {
         try {
             const portfolios = await this.prisma.portfolio.findMany({
                 where: {
@@ -40,6 +43,8 @@ export class PortfolioService {
                 }
             })
 
+            console.log(portfolios)
+
             return portfolios
 
         } catch (error) {
@@ -47,7 +52,7 @@ export class PortfolioService {
         }
     }
 
-    public async getOnePortfolio(portfolioId: number) {
+    public async getOnePortfolio(portfolioId: number): Promise<PortfolioWithTransactionEntity> {
         try {
             const portfolio = await this.prisma.portfolio.findFirst({
                 where: {
@@ -69,7 +74,7 @@ export class PortfolioService {
         }
     }
 
-    public async editPortfolio(dto: UpdatePortfolioInput, userId: number) {
+    public async editPortfolio(dto: UpdatePortfolioInput, userId: number): Promise<PortfolioEntity> {
         try {
 
             const portfolio = await this.getOnePortfolio(dto.id)
@@ -96,7 +101,7 @@ export class PortfolioService {
         }
     }
 
-    public async deletePortfolio(portfolioId: number, userId: number) {
+    public async deletePortfolio(portfolioId: number, userId: number): Promise<MessageEntity> {
         try {
             const portfolioToDelete = await this.getOnePortfolio(portfolioId)
 

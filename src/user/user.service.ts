@@ -1,14 +1,14 @@
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthInput } from 'src/auth/dto/register-auth.input';
 import { PrismaService } from 'src/common/prisma/prisma';
-import { User } from './types';
+import { UserEntity } from './entity/user.entity';
 
 @Injectable()
 export class UserService {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    public async create(createUserDto: CreateAuthInput): Promise<User> {
+    public async create(createUserDto: CreateAuthInput): Promise<UserEntity> {
         try {
             return this.prisma.user.create({ data: createUserDto });
         } catch (error) {
@@ -16,7 +16,7 @@ export class UserService {
         }
     }
 
-    public async getUserByEmail(email: string): Promise<User | null> {
+    public async getUserByEmail(email: string): Promise<UserEntity> {
         try { 
             const user = await this.prisma.user.findUnique({
                 where: { email: email }
@@ -29,7 +29,7 @@ export class UserService {
     }
     
 
-    public async getUserById(id: string): Promise<User | null>  {
+    public async getUserById(id: string): Promise<UserEntity> {
         try { 
             const user = await this.prisma.user.findFirst({
                 where: { id: +id }
@@ -42,7 +42,7 @@ export class UserService {
         }
     }
 
-    public async getAllUsers(): Promise<User[]>  {
+    public async getAllUsers(): Promise<UserEntity[]> {
         try {
             const users = await this.prisma.user.findMany();
 

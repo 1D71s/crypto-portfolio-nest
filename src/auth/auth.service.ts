@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt'; 
 import { LoginAuthInput } from './dto/login-auth.input';
 import { Response, Request } from 'express';
-import { User } from 'src/user/types';
+import { UserEntity } from 'src/user/entity/user.entity';
 import { TokenEntity } from './entity/token.entity';
 
 
@@ -17,7 +17,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) { }
     
-    public async getMe(req: Request): Promise<User> {
+    public async getMe(req: Request): Promise<UserEntity> {
         try {
             const token = req.cookies.token;
     
@@ -96,7 +96,7 @@ export class AuthService {
         }
     }
 
-    private async validateUser(dto: LoginAuthInput): Promise<User> {
+    private async validateUser(dto: LoginAuthInput): Promise<UserEntity> {
         try {
             const user = await this.userService.getUserByEmail(dto.email);
 

@@ -1,24 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import 'dotenv/config';
 import axios from 'axios';
+import { TransactionService } from 'src/transaction/transaction.service';
 
 
 @Injectable()
 export class StatisticsService {
 
+    constructor(private readonly transactionService: TransactionService) {}
+
     public async calculateTotalProfit() {
-        // - Вход: цена покупки, текущая цена
-        // - Действие: Рассчитывает прибыль, сравнив начальную цену покупки с текущей ценой криптовалюты.
-        // - Возвращаемое значение: Прибыль.
+        
     }
 
     public async calculateProfitOneCrypto() {
-        // - Вход: цена покупки, текущая цена
-        // - Действие: Рассчитывает прибыль, сравнив начальную цену покупки с текущей ценой криптовалюты.
-        // - Возвращаемое значение: Прибыль.
+        
     }
 
-    async getHistoryPrice() {
+    public async calculateProfitOneTransaction() {
+        
+    }
+
+    async getHistoryPriceOfDay() {
         try {
             const url = 'https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=600';
             const apiKey = process.env.API_KEY;

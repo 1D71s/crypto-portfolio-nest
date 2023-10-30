@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 type UserEntity {
-  id: String!
+  id: Float!
   name: String!
   email: String!
   password: String!
@@ -19,12 +19,23 @@ type TransactionEntity {
   operation: Boolean!
   price: Float!
   spent: Float!
-  date: String!
+  date: DateTime!
   authorId: Float!
   portfolioId: Float!
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type PortfolioEntity {
+  id: Float!
+  name: String!
+  authorId: Float!
+}
+
+type PortfolioWithTransactionEntity {
   id: Float!
   name: String!
   authorId: Float!
@@ -40,18 +51,13 @@ type PriceData {
   open: Float!
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type Query {
   getUserById(id: String!): UserEntity!
   getAllUsers: [UserEntity!]!
   login(input: LoginAuthInput!): TokenEntity!
   getme: UserEntity!
-  getAllUserPortfolio: [PortfolioEntity!]!
-  getOnePortfolio(input: IdPortfolioInput!): PortfolioEntity!
+  getAllUserPortfolio: [PortfolioWithTransactionEntity!]!
+  getOnePortfolio(input: IdPortfolioInput!): PortfolioWithTransactionEntity!
   getPrice: [PriceData!]!
   getOneTransaction(input: IdInput!): TransactionEntity!
 }

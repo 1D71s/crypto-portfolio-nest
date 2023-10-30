@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { PrismaService } from 'src/common/prisma/prisma';
 import { AddTransactionInput } from './dto/add-transaction';
 import { UpdateTransactionInput } from './dto/edit-transaction';
+import { MessageEntity } from 'src/common/global-endity/message.endity';
+import { TransactionEntity } from './endity/transaction-endity';
 
 
 @Injectable()
@@ -9,7 +11,7 @@ export class TransactionService {
     
     constructor( private readonly prisma: PrismaService ) {}
 
-    public async addTransaction(dto: AddTransactionInput, userId: number) {
+    public async addTransaction(dto: AddTransactionInput, userId: number): Promise<TransactionEntity> {
         try {
 
             const portfolio = await this.prisma.portfolio.findFirst({ where: { id: +dto.portfolioId } })
@@ -39,7 +41,7 @@ export class TransactionService {
         }
     }
 
-    public async editTransaction(dto: UpdateTransactionInput, userId: number) {
+    public async editTransaction(dto: UpdateTransactionInput, userId: number): Promise<TransactionEntity> {
         try {
             const transaction = await this.getOneTransaction(dto.id)
             
@@ -70,7 +72,7 @@ export class TransactionService {
         }
     }
 
-    public async getOneTransaction(transactionId: number) {
+    public async getOneTransaction(transactionId: number): Promise<TransactionEntity> {
         try {
             const transaction = await this.prisma.transaction.findUnique({
                 where: { id: +transactionId },
@@ -87,7 +89,7 @@ export class TransactionService {
         }
     }
 
-    public async deleteTransaction(id: number, userId: number) {
+    public async deleteTransaction(id: number, userId: number): Promise<MessageEntity> {
         try {
             const transactionToDelete = await this.getOneTransaction(id);
 

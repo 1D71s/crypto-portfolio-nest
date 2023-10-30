@@ -19,7 +19,7 @@ export class TransactionEntity {
     readonly spent: number;
 
     @Field()
-    readonly date: string;
+    readonly date: Date;
 
     @Field()
     readonly authorId: number;
