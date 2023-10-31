@@ -43,7 +43,6 @@ export class PortfolioService {
                 }
             })
 
-            console.log(portfolios)
 
             return portfolios
 

@@ -47,8 +47,7 @@ type TokenEntity {
 }
 
 type PriceData {
-  time: DateTime!
-  open: Float!
+  price: Float!
 }
 
 type Query {
@@ -58,8 +57,9 @@ type Query {
   getme: UserEntity!
   getAllUserPortfolio: [PortfolioWithTransactionEntity!]!
   getOnePortfolio(input: IdPortfolioInput!): PortfolioWithTransactionEntity!
-  getPrice: [PriceData!]!
+  test: PriceData!
   getOneTransaction(input: IdInput!): TransactionEntity!
+  getAllTransactionInPortfolio(input: IdInput!): [TransactionEntity!]!
 }
 
 input LoginAuthInput {

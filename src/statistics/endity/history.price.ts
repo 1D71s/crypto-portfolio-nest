@@ -4,9 +4,6 @@ import { Field, ObjectType } from '@nestjs/graphql';
 export class PriceData {
 
     @Field()
-    time: Date;
-
-    @Field()
-    open: number;
+    price: number;
     
 }

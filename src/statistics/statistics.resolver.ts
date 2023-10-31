@@ -5,10 +5,10 @@ import { PriceData } from './endity/history.price';
 @Resolver()
 export class StatisticsResolver {
 
-    constructor(private readonly statisticsService: StatisticsService) { }
-    
-    @Query(() => [PriceData])
-    async getPrice() {
-        return this.statisticsService.getHistoryPriceOfDay();
+    constructor(private readonly statisticsService: StatisticsService) {}
+
+    @Query(() => PriceData)
+    async test() {
+        return this.statisticsService.calculateTotalProfit();
     }
 }

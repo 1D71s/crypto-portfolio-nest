@@ -34,6 +34,12 @@ export class TransactionResolver {
     }
 
     @UseGuards(AuthGuard)
+    @Query(() => [TransactionEntity])
+    getAllTransactionInPortfolio(@Args('input') dto: IdInput) {
+        return this.transactionService.getAllTransactionInPortfolio(dto.id)
+    }
+
+    @UseGuards(AuthGuard)
     @Mutation(() => MessageEntity)
     deleteTransaction(@User() user: UserEntity, @Args('input') dto: IdInput) {
         return this.transactionService.deleteTransaction(dto.id, +user.id)
