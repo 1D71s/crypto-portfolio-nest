@@ -7,6 +7,7 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { CoinModule } from './coin/coin.module';
 
 @Module({
     imports: [
@@ -19,7 +20,8 @@ import { TransactionModule } from './transaction/transaction.module';
             context: ({ req, res }) => ({ req, res })
         }),
         StatisticsModule,
-        TransactionModule
+        TransactionModule,
+        CoinModule,
     ],
     controllers: [],
     providers: [],
