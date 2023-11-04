@@ -3,8 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { TransactionEntity } from 'src/transaction/endity/transaction-endity';
 import { CoinService } from 'src/coin/coin.service';
-import { map } from "rxjs";
-
 
 @Injectable()
 export class StatisticsService {
@@ -12,7 +10,7 @@ export class StatisticsService {
     constructor(
         private readonly transactionService: TransactionService,
         private readonly coinService: CoinService
-    ) { }
+    ) {}
 
     public async calculateTotalProfit(portfolio = 1) {
         try {
@@ -24,7 +22,7 @@ export class StatisticsService {
             
             const sortedCoins = await this.coinService.sortCoin(transactions);
 
-            const coin = await this.calculateProfitOneCrypto(sortedCoins['WBT']);
+            const coin = await this.calculateProfitOneCrypto(sortedCoins['BTC']);
 
             return coin
 
@@ -43,7 +41,8 @@ export class StatisticsService {
     
         const chart = [];
         let portfolioState = 0;
-        for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+
+        for (let date = startDate; date <= endDate; date.setDate(date.getDate() + (365 / 12))) {
 
             const timestamp = Math.floor(date.getTime() / 1000);
 
@@ -54,28 +53,20 @@ export class StatisticsService {
                 portfolioState += this.getOneDayTransactionResult(oneDayTransaction)
                 chart.push({ portfolioState , date: new Date(timestamp * 1000), coin: transactions[0].coin});
             } else {
-                chart.push({ portfolioState , date: new Date(timestamp * 1000), coin: transactions[0].coin});
+                chart.push({ portfolioState, date: new Date(timestamp * 1000), coin: transactions[0].coin});
             }
-
         }
 
-        const promises = chart.map(async item => {
+        const result = await Promise.all(chart.map(async (item) => {
             const portfolioState = +item.portfolioState;
-            const date = +new Date(+item.date);
+            const date = +new Date(+item.date / 1000);
             const coin = item.coin;
+            const historyPrice = await this.coinService.getHistoryPriceOneDay(date, coin);
 
-            const historyPricePromise = this.coinService.getHistoryPriceOneDay(date, coin);
-
-            const historyPrice = await +historyPricePromise;
-
-            return portfolioState * historyPrice;
-        });
-
-        const result = await Promise.all(promises);
+            return historyPrice / portfolioState ;
+        }));
 
         return result;
-
-
     }
 
     private getOneDayTransactionResult(transactions: TransactionEntity[]) {
@@ -84,6 +75,8 @@ export class StatisticsService {
         for (let i = 0; i < transactions.length; i++) {
             if (transactions[i].operation) {
                 result += transactions[i].spent
+            } else  {
+                result -= transactions[i].spent
             }
         }
 

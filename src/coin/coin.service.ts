@@ -35,11 +35,9 @@ export class CoinService {
                 },
             });
 
-            const data = response.data;
+            const data = response.data[`${coin}`].USD;
 
-            console.log(data)
-
-            return {price: data};
+            return data;
             
         } catch (error) {
             throw error;
