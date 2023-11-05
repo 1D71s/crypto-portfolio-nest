@@ -30,6 +30,7 @@ export class TransactionService {
                     operation: dto.operation,
                     price: dto.price,
                     spent: dto.spent,
+                    spentCoin: dto.spent / dto.price,
                     date: dto.date,
                     authorId: +userId,
                     portfolioId: dto.portfolioId
@@ -62,6 +63,7 @@ export class TransactionService {
                     operation: dto.operation,
                     price: dto.price,
                     spent: dto.spent,
+                    spentCoin: dto.spent / dto.price,
                     date: dto.date,
                     authorId: +userId,
                 }

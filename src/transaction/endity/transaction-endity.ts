@@ -19,6 +19,9 @@ export class TransactionEntity {
     readonly spent: number;
 
     @Field()
+    readonly spentCoin: number;
+
+    @Field()
     readonly date: Date;
 
     @Field()

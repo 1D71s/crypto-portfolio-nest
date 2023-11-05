@@ -22,7 +22,7 @@ export class StatisticsService {
             
             const sortedCoins = await this.coinService.sortCoin(transactions);
 
-            const coin = await this.calculateProfitOneCrypto(sortedCoins['BTC']);
+            const coin = await this.calculateProfitOneCrypto(sortedCoins['WBT']);
 
             return coin
 
@@ -42,7 +42,7 @@ export class StatisticsService {
         const chart = [];
         let portfolioState = 0;
 
-        for (let date = startDate; date <= endDate; date.setDate(date.getDate() + (365 / 12))) {
+        for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
 
             const timestamp = Math.floor(date.getTime() / 1000);
 
@@ -61,12 +61,12 @@ export class StatisticsService {
             const portfolioState = +item.portfolioState;
             const date = +new Date(+item.date / 1000);
             const coin = item.coin;
-            const historyPrice = await this.coinService.getHistoryPriceOneDay(date, coin);
+            //const historyPrice = await this.coinService.getHistoryPriceOneDay(date, coin);
 
-            return historyPrice / portfolioState ;
+            return portfolioState ;
         }));
 
-        return result;
+        return chart;
     }
 
     private getOneDayTransactionResult(transactions: TransactionEntity[]) {
@@ -74,9 +74,9 @@ export class StatisticsService {
     
         for (let i = 0; i < transactions.length; i++) {
             if (transactions[i].operation) {
-                result += transactions[i].spent
+                result += transactions[i].spentCoin
             } else  {
-                result -= transactions[i].spent
+                result -= transactions[i].spentCoin
             }
         }
 

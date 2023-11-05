@@ -28,8 +28,9 @@ model Transaction {
   id          Int       @id @default(autoincrement())
   coin        String
   operation   Boolean
-  price       Int
-  spent       Int
+  price       Float
+  spent       Float
+  spentCoin   Float
   date        DateTime
   authorId    Int
   author      User      @relation("author", fields: [authorId], references: [id])

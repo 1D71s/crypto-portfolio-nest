@@ -19,6 +19,7 @@ type TransactionEntity {
   operation: Boolean!
   price: Float!
   spent: Float!
+  spentCoin: Float!
   date: DateTime!
   authorId: Float!
   portfolioId: Float!
