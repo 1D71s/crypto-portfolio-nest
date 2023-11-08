@@ -15,9 +15,7 @@ export class StatisticsService {
     public async getTotalProfitPortfolio(portfolioId: number) {
         try {
             const crypto = await this.prisma.transaction.findMany({
-                where: {
-                    portfolioId: portfolioId
-                }
+                where: {  portfolioId: portfolioId }
             })
 
             const uniqueCoinsSet = new Set(crypto.map(transaction => transaction.coin));
@@ -28,7 +26,23 @@ export class StatisticsService {
                 return result
             }));
 
-            return statePortfolio
+            const totalStart = statePortfolio.reduce((accumulator, currentItem) => {
+                return accumulator + currentItem.start;
+            }, 0);
+
+            const totalNow = statePortfolio.reduce((accumulator, currentItem) => {
+                return accumulator + currentItem.now;
+            }, 0);
+
+            const differentStartNow = {
+                totalStart,
+                totalNow,
+                differentProcent: totalNow - totalStart,
+                differentUsd: ((totalNow - totalStart) / totalStart) * 100,
+                coins: statePortfolio, 
+            };
+
+            return differentStartNow;
         } catch (error) {
             throw error;
         }
@@ -38,24 +52,28 @@ export class StatisticsService {
         try {
             const priceToday = await this.coinService.getHistoryPriceOneDay(Date.now(), coin);
 
-            const result = {
-                usdt: 0,
-                coin: 0
-            }
+            const state = { usd: 0, coin: 0 }
 
             const spent = await this.prisma.transaction.findMany({
-                where: {
-                    coin,
-                    portfolioId
-                }
+                where: { coin, portfolioId }
             })
 
             for (let i = 0; i < spent.length; i++) {
-                result.usdt += spent[i].spent;
-                result.coin += spent[i].spentCoin;
+                state.usd += spent[i].spent;
+                state.coin += spent[i].spentCoin;
             }
 
-            return { priceStart: result.usdt, price: result.coin *= priceToday };
+            const now = state.coin * priceToday;
+
+            const result = {
+                coin,
+                now,
+                start: state.usd,
+                profitProcent: ((now - state.usd) / state.usd) * 100,
+                profitUsd: now - state.usd
+            };
+
+            return result
         } catch (error) {
             throw error;
         }
