@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { CoinModule } from './coin/coin.module';
+import { ChartModule } from './chart/chart.module';
+import { FortestModule } from './fortest/fortest.module';
 
 @Module({
     imports: [
@@ -22,6 +24,8 @@ import { CoinModule } from './coin/coin.module';
         StatisticsModule,
         TransactionModule,
         CoinModule,
+        ChartModule,
+        FortestModule,
     ],
     controllers: [],
     providers: [],

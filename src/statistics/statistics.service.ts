@@ -1,90 +1,81 @@
 import 'dotenv/config';
 import { Injectable } from '@nestjs/common';
-import { TransactionService } from 'src/transaction/transaction.service';
-import { TransactionEntity } from 'src/transaction/endity/transaction-endity';
 import { CoinService } from 'src/coin/coin.service';
+import { PrismaService } from 'src/common/prisma/prisma';
+import { TransactionEntity } from 'src/transaction/endity/transaction-endity';
 
 @Injectable()
 export class StatisticsService {
 
     constructor(
-        private readonly transactionService: TransactionService,
+        private readonly prisma: PrismaService,
         private readonly coinService: CoinService
     ) {}
 
-    public async calculateTotalProfit(portfolio = 1) {
+    public async getTotalProfitPortfolio(portfolioId: number) {
         try {
-            const transactions = await this.transactionService.getAllTransactionInPortfolio(portfolio);
+            const crypto = await this.prisma.transaction.findMany({
+                where: {
+                    portfolioId: portfolioId
+                }
+            })
 
-            if (transactions.length === 0) {
-                return {message: 'Transaction not found!'}
-            }
-            
-            const sortedCoins = await this.coinService.sortCoin(transactions);
+            const uniqueCoinsSet = new Set(crypto.map(transaction => transaction.coin));
+            const uniqueCoinsArray = Array.from(uniqueCoinsSet);
 
-            const coin = await this.calculateProfitOneCrypto(sortedCoins['WBT']);
+            const statePortfolio = await Promise.all(uniqueCoinsArray.map(async (item) => {
+                const result = await this.getTotalProfitOneCrypto(portfolioId, item);
+                return result
+            }));
 
-            return coin
-
+            return statePortfolio
         } catch (error) {
             throw error;
         }
     }
 
-    public async calculateProfitOneCrypto(transactions: TransactionEntity[]) {
+    public async getTotalProfitOneCrypto(portfolioId: number, coin: string) {
+        try {
+            const priceToday = await this.coinService.getHistoryPriceOneDay(Date.now(), coin);
 
-        const oldestDate = await this.getOldestDate(transactions);
-        const todayData = Math.floor(Date.now() / 1000);
-
-        const startDate = new Date(oldestDate * 1000);
-        const endDate = new Date(todayData * 1000);
-    
-        const chart = [];
-        let portfolioState = 0;
-
-        for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
-
-            const timestamp = Math.floor(date.getTime() / 1000);
-
-            const hasTimestamp = transactions.some(item => new Date(+item.date).getTime() / 1000 === +timestamp);
-
-            if (hasTimestamp) {
-                const oneDayTransaction = transactions.filter(item => +item.date === +new Date(timestamp * 1000))
-                portfolioState += this.getOneDayTransactionResult(oneDayTransaction)
-                chart.push({ portfolioState , date: new Date(timestamp * 1000), coin: transactions[0].coin});
-            } else {
-                chart.push({ portfolioState, date: new Date(timestamp * 1000), coin: transactions[0].coin});
+            const result = {
+                usdt: 0,
+                coin: 0
             }
+
+            const spent = await this.prisma.transaction.findMany({
+                where: {
+                    coin,
+                    portfolioId
+                }
+            })
+
+            for (let i = 0; i < spent.length; i++) {
+                result.usdt += spent[i].spent;
+                result.coin += spent[i].spentCoin;
+            }
+
+            return { priceStart: result.usdt, price: result.coin *= priceToday };
+        } catch (error) {
+            throw error;
         }
-
-        const result = await Promise.all(chart.map(async (item) => {
-            const portfolioState = +item.portfolioState;
-            const date = +new Date(+item.date / 1000);
-            const coin = item.coin;
-            //const historyPrice = await this.coinService.getHistoryPriceOneDay(date, coin);
-
-            return portfolioState ;
-        }));
-
-        return chart;
     }
 
-    private getOneDayTransactionResult(transactions: TransactionEntity[]) {
+    public getOneDayTransactionSum(transactions: TransactionEntity[]): number {
         let result = 0;
     
         for (let i = 0; i < transactions.length; i++) {
             if (transactions[i].operation) {
-                result += transactions[i].spentCoin
+                result += transactions[i].spentCoin;
             } else  {
-                result -= transactions[i].spentCoin
+                result -= transactions[i].spentCoin;
             }
         }
 
         return result;
     }
     
-    private getOldestDate(transactions: TransactionEntity[]) {
-
+    public getOldestDate(transactions: TransactionEntity[]): number {
         if (transactions.length === 0) {
             return null; 
         }

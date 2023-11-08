@@ -47,10 +47,6 @@ type TokenEntity {
   token: String!
 }
 
-type PriceData {
-  price: Float!
-}
-
 type Query {
   getUserById(id: String!): UserEntity!
   getAllUsers: [UserEntity!]!
@@ -58,7 +54,6 @@ type Query {
   getme: UserEntity!
   getAllUserPortfolio: [PortfolioWithTransactionEntity!]!
   getOnePortfolio(input: IdPortfolioInput!): PortfolioWithTransactionEntity!
-  test: PriceData!
   getOneTransaction(input: IdInput!): TransactionEntity!
   getAllTransactionInPortfolio(input: IdInput!): [TransactionEntity!]!
 }

@@ -3,14 +3,16 @@ import { StatisticsService } from './statistics.service';
 import { StatisticsResolver } from './statistics.resolver';
 import { TransactionModule } from 'src/transaction/transaction.module';
 import { CoinModule } from 'src/coin/coin.module';
-import { StatisticsController } from "./statistics.controller";
+import { PrismaService } from 'src/common/prisma/prisma';
 
 @Module({
-  controllers: [StatisticsController],
-  providers: [StatisticsResolver, StatisticsService],
+  providers: [StatisticsResolver, StatisticsService, PrismaService],
   imports: [
     TransactionModule,
-    CoinModule
+    CoinModule,
+  ],
+  exports: [
+    StatisticsService
   ]
 })
 export class StatisticsModule {}
