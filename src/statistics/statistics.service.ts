@@ -3,6 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { CoinService } from 'src/coin/coin.service';
 import { PrismaService } from 'src/common/prisma/prisma';
 import { TransactionEntity } from 'src/transaction/endity/transaction-endity';
+import { ItemStatisticEndity } from './endity/item-statistic-endity';
+import { Different24hEndity } from 'src/statistics/endity/different24h-endity';
+import { FullStatisticEndity } from './endity/full-statistic-endity';
 
 @Injectable()
 export class StatisticsService {
@@ -12,7 +15,7 @@ export class StatisticsService {
         private readonly coinService: CoinService
     ) {}
 
-    public async getTotalProfitPortfolio(portfolioId: number) {
+    public async getTotalProfitPortfolio(portfolioId: number): Promise<FullStatisticEndity> {
         try {
             const crypto = await this.prisma.transaction.findMany({
                 where: {  portfolioId: portfolioId }
@@ -34,9 +37,12 @@ export class StatisticsService {
                 return accumulator + currentItem.now;
             }, 0);
 
+            const different24h = this.getDifferentOfOneDayAllCoins(statePortfolio, totalNow)
+
             const differentStartNow = {
                 totalStart,
                 totalNow,
+                different24h,
                 differentProcent: totalNow - totalStart,
                 differentUsd: ((totalNow - totalStart) / totalStart) * 100,
                 coins: statePortfolio, 
@@ -48,11 +54,11 @@ export class StatisticsService {
         }
     }
 
-    public async getTotalProfitOneCrypto(portfolioId: number, coin: string) {
+    public async getTotalProfitOneCrypto(portfolioId: number, coin: string): Promise<ItemStatisticEndity> {
         try {
             const priceToday = await this.coinService.getHistoryPriceOneDay(Date.now(), coin);
 
-            const state = { usd: 0, coin: 0 }
+            const state = { usd: 0, coin: 0 };
 
             const spent = await this.prisma.transaction.findMany({
                 where: { coin, portfolioId }
@@ -64,20 +70,58 @@ export class StatisticsService {
             }
 
             const now = state.coin * priceToday;
+            const different24h = await this.getDifferentOfOneDay(coin, state.coin);
 
             const result = {
                 coin,
                 now,
+                different24h,
                 start: state.usd,
+                coinState: state.coin,
                 profitProcent: ((now - state.usd) / state.usd) * 100,
                 profitUsd: now - state.usd
             };
 
-            return result
+            return result;
         } catch (error) {
             throw error;
         }
     }
+
+    private getDifferentOfOneDayAllCoins(coins: ItemStatisticEndity[], state: number): Different24hEndity {
+        const result = { procent: 0, usd: 0 };
+
+        for (let i = 0; i < coins.length; i++) {
+            result.usd += coins[i].different24h.usd;
+        }
+
+        result.procent = (result.usd / state) * 100;
+
+        return result;
+    }
+
+    private async getDifferentOfOneDay(coin: string, coinState: number): Promise<Different24hEndity> {
+        try {
+            const currentDate = new Date();
+    
+            const twentyFourHoursAgo = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
+        
+            const priceYesterday = await this.coinService.getHistoryPriceOneDay(+new Date(+twentyFourHoursAgo / 1000), coin);
+
+            const priceToday = await this.coinService.getHistoryPriceOneDay(Date.now(), coin);
+
+            const differentUsd = (priceToday * coinState) - (priceYesterday * coinState)
+
+            const differenceProcent = ((priceToday - priceYesterday) / priceYesterday) * 100;
+
+            const result = { usd: differentUsd, procent: differenceProcent };
+        
+            return result;
+            
+        } catch (error) {
+            throw error;
+        }
+    }    
 
     public getOneDayTransactionSum(transactions: TransactionEntity[]): number {
         let result = 0;
