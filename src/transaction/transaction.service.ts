@@ -108,6 +108,24 @@ export class TransactionService {
         }
     }
 
+    public async getTransactionsByCoinPortfolio(portfolioId: number, coin: string): Promise<TransactionEntity[]> {
+        try {
+            const transactions = await this.prisma.transaction.findMany({
+                where: { portfolioId, coin }
+            });
+
+            if (!transactions) {
+                throw new NotFoundException('Transaction not found');
+            }
+
+            console.log(transactions)
+
+            return transactions
+        } catch (error) {
+            throw error;
+        }
+    }
+
     public async deleteTransaction(id: number, userId: number): Promise<MessageEntity> {
         try {
             const transactionToDelete = await this.getOneTransaction(id);

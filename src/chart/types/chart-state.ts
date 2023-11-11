@@ -1,7 +1,7 @@
 
 export interface ChartState {
 
-    portfolioState: number;
+    coinState: number;
 
     date: Date;
 

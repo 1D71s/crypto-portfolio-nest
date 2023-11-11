@@ -26,7 +26,7 @@ export class StatisticsService {
 
             const statePortfolio = await Promise.all(uniqueCoinsArray.map(async (item) => {
                 const result = await this.getTotalProfitOneCrypto(portfolioId, item);
-                return result
+                return result;
             }));
 
             const totalStart = statePortfolio.reduce((accumulator, currentItem) => {
@@ -37,14 +37,14 @@ export class StatisticsService {
                 return accumulator + currentItem.now;
             }, 0);
 
-            const different24h = this.getDifferentOfOneDayAllCoins(statePortfolio, totalNow)
+            const different24h = this.getDifferentOfOneDayAllCoins(statePortfolio, totalNow);
 
             const differentStartNow = {
                 totalStart,
                 totalNow,
                 different24h,
-                differentProcent: totalNow - totalStart,
-                differentUsd: ((totalNow - totalStart) / totalStart) * 100,
+                differentUsd: totalNow - totalStart,
+                differentProcent: ((totalNow - totalStart) / totalStart) * 100,
                 coins: statePortfolio, 
             };
 
@@ -104,14 +104,12 @@ export class StatisticsService {
         try {
             const currentDate = new Date();
     
-            const twentyFourHoursAgo = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-        
+            const twentyFourHoursAgo = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);    
             const priceYesterday = await this.coinService.getHistoryPriceOneDay(+new Date(+twentyFourHoursAgo / 1000), coin);
 
             const priceToday = await this.coinService.getHistoryPriceOneDay(Date.now(), coin);
 
-            const differentUsd = (priceToday * coinState) - (priceYesterday * coinState)
-
+            const differentUsd = (priceToday * coinState) - (priceYesterday * coinState);
             const differenceProcent = ((priceToday - priceYesterday) / priceYesterday) * 100;
 
             const result = { usd: differentUsd, procent: differenceProcent };

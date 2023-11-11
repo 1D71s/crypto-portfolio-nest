@@ -24,7 +24,7 @@ export class CoinService {
         return sortedCrypto;
     }
 
-    public async getHistoryPriceOneDay(date: number, coin: string) {
+    public async getHistoryPriceOneDay(date: number, coin: string): Promise<number> {
         try {
             const url = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${coin}&tsyms=USD&ts=${date}`;
             const apiKey = process.env.API_KEY;
