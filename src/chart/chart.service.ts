@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CoinService } from 'src/coin/coin.service';
 import { StatisticsService } from 'src/statistics/statistics.service';
-import { ChartState } from 'src/chart/types/chart-state';
+import { ChartState, ChartStateForResult } from 'src/chart/types/chart-state';
 import { TransactionEntity } from 'src/transaction/endity/transaction-endity';
 import { TransactionService } from 'src/transaction/transaction.service';
+import { MessageEntity } from 'src/common/global-endity/message.endity';
 
 @Injectable()
 export class ChartService {
@@ -12,9 +13,9 @@ export class ChartService {
         private readonly transactionService: TransactionService,
         private readonly coinService: CoinService,
         private readonly statisticsService: StatisticsService
-    ) {}
+    ) { }
 
-    public async calculateTotalProfitChart(portfolio = 1) {
+    public async calculateTotalProfitChart(portfolio: number): Promise<ChartStateForResult[] | MessageEntity> {
         try {
             const transactions = await this.transactionService.getAllTransactionInPortfolio(portfolio);
 
@@ -26,29 +27,20 @@ export class ChartService {
 
             const uniqueCoins = [...new Set(transactions.map(transaction => transaction.coin))];
 
-            const totalChart = []
-
-            for (let i = 0; i < uniqueCoins.length; i++) {
-                const coin = await this.getStateDaysChartOneCrypto(sortedCoins[`${uniqueCoins[i]}`]);
-                totalChart.push(...coin)
-            }
-
-            return totalChart;
+            const totalChart = await Promise.all(
+                uniqueCoins.map(async (coin) => {
+                    const chart = await this.getStateDaysChartOneCrypto(sortedCoins[coin]);
+                    return chart;
+                })
+            );
+            const flattenedChart = totalChart.flat();
             
-        } catch (error) {
-            throw error;
-        }
-    }
+            const sortedByDate = this.sortedByDateAndCalculate(flattenedChart)
 
-    public async calculateOneCryptoProfitChart(portfolio: number, coin: string): Promise<ChartState[]> {
-        try {
-            const transactions = await this.transactionService.getTransactionsByCoinPortfolio(portfolio, coin)
+            const calculateProfit = await this.calculateItemByDate(sortedByDate)
 
-            const chart = await this.getStateDaysChartOneCrypto(transactions);
+            return calculateProfit;
 
-            const result = await this.getStateChartOneCrypto(chart)
-
-            return result
         } catch (error) {
             throw error;
         }
@@ -82,9 +74,9 @@ export class ChartService {
         return chart;
     }
 
-    private async getStateChartOneCrypto(chart: ChartState[]): Promise<ChartState[]> {
+    private async toShortChart(chart: ChartState[][]): Promise<ChartState[][]> {
         try {
-            const count = chart.length > 28 ? 10 : 1
+            const count = chart.length > 28 ? 30 : 3
 
             const finalyChart = []
 
@@ -92,27 +84,68 @@ export class ChartService {
                 finalyChart.push(chart[i])
             }
 
-            finalyChart[finalyChart.length - 1].date = new Date()
+            finalyChart[finalyChart.length - 1].map(item => {
+                item.date = new Date()
+            })
 
-            const result = await this.getProfitChartOneCrypto(finalyChart)
-
-            return result
+            return finalyChart
 
         } catch (error) {
             throw error;
         }
     }
 
-    private async getProfitChartOneCrypto(chartStateDays: ChartState[]): Promise<ChartState[]> {
-        const chart = await Promise.all(chartStateDays.map(async (item) => {
-            const coinState = +item.coinState;
-            const date = +new Date(+item.date / 1000);
-            const coin = item.coin;
-            const historyPrice = await this.coinService.getHistoryPriceOneDay(date, coin);
+    private sortedByDateAndCalculate(flattenedChart: ChartState[]): ChartState[][] {
+        const sortedByDate: Record<string, ChartState[]> = {};
 
-            return {...item, coinState: coinState * historyPrice} ;
-        }));
+        for (let i = 0; i < flattenedChart.length; i++) {
+            const currentDate = flattenedChart[i].date.toISOString();
 
-        return chart;
+            if (sortedByDate[currentDate] === undefined) {
+                sortedByDate[currentDate] = [{ ...flattenedChart[i] }];
+            } else {
+                sortedByDate[currentDate].push({ ...flattenedChart[i] });
+            }
+        }
+
+        const toArray = Object.values(sortedByDate);
+
+        return toArray;
+    }
+
+    private async calculateItemByDate(chartState: ChartState[][]): Promise<ChartStateForResult[]> {
+        try {
+            const finalyChart = await this.toShortChart(chartState)
+
+            const chart = await Promise.all(finalyChart.map(async (item) => {
+                const result = await Promise.all(item.map(async (item) => {
+                    const coinState = +item.coinState;
+                    const date = +new Date(+item.date / 1000);
+                    const coin = item.coin;
+                    const historyPrice = await this.coinService.getHistoryPriceOneDay(date, coin);
+    
+                    return {...item, coinState: coinState * historyPrice} ;
+                }));
+
+                return result
+            }));
+
+            const result = this.calculateProfit(chart)
+
+            return result
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    private calculateProfit(chartState: ChartState[][]): ChartStateForResult[] {
+        const result: ChartStateForResult[] = chartState.map(item => {
+            const state = item.reduce((accumulator, current) => accumulator + current.coinState, 0);
+            const date = item[0].date;
+    
+            return { date, coinState: state };
+        });
+    
+        return result;
     }
 }

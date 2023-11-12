@@ -118,8 +118,6 @@ export class TransactionService {
                 throw new NotFoundException('Transaction not found');
             }
 
-            console.log(transactions)
-
             return transactions
         } catch (error) {
             throw error;

@@ -11,12 +11,7 @@ export class FortestController {
 
     @Get()
     addToCart() {
-        return this.chartService.calculateTotalProfitChart()
-    }
-
-    @Get('/one')
-    getOne() {
-        return this.chartService.calculateOneCryptoProfitChart(1, 'BTC')
+        return this.chartService.calculateTotalProfitChart(1)
     }
 
     @Get('/total')
