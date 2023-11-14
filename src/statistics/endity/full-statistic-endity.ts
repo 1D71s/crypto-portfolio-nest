@@ -20,6 +20,6 @@ export class FullStatisticEndity {
     @Field()
     differentUsd: number;
 
-    @Field()
+    @Field(() => [ItemStatisticEndity])
     coins: ItemStatisticEndity[]
 }

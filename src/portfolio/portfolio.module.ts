@@ -21,6 +21,9 @@ import { JwtModule } from '@nestjs/jwt';
           expiresIn: '24h'
       }
     })
+  ],
+  exports: [
+    PortfolioService
   ]
 })
 export class PortfolioModule {}

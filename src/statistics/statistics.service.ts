@@ -1,18 +1,20 @@
 import 'dotenv/config';
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CoinService } from 'src/coin/coin.service';
 import { PrismaService } from 'src/common/prisma/prisma';
 import { TransactionEntity } from 'src/transaction/endity/transaction-endity';
 import { ItemStatisticEndity } from './endity/item-statistic-endity';
 import { Different24hEndity } from 'src/statistics/endity/different24h-endity';
 import { FullStatisticEndity } from './endity/full-statistic-endity';
+import { PortfolioService } from 'src/portfolio/portfolio.service';
 
 @Injectable()
 export class StatisticsService {
 
     constructor(
         private readonly prisma: PrismaService,
-        private readonly coinService: CoinService
+        private readonly coinService: CoinService,
+        private readonly portfolioService: PortfolioService,
     ) {}
 
     public async getTotalProfitPortfolio(portfolioId: number): Promise<FullStatisticEndity> {

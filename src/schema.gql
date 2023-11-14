@@ -47,6 +47,35 @@ type TokenEntity {
   token: String!
 }
 
+type Different24hEndity {
+  procent: Float!
+  usd: Float!
+}
+
+type ItemStatisticEndity {
+  coin: String!
+  now: Float!
+  different24h: Different24hEndity!
+  start: Float!
+  coinState: Float!
+  profitProcent: Float!
+  profitUsd: Float!
+}
+
+type FullStatisticEndity {
+  totalStart: Float!
+  totalNow: Float!
+  different24h: Different24hEndity!
+  differentProcent: Float!
+  differentUsd: Float!
+  coins: [ItemStatisticEndity!]!
+}
+
+type ChartStateForResult {
+  coinState: Float!
+  date: DateTime!
+}
+
 type Query {
   getUserById(id: String!): UserEntity!
   getAllUsers: [UserEntity!]!
@@ -54,8 +83,11 @@ type Query {
   getme: UserEntity!
   getAllUserPortfolio: [PortfolioWithTransactionEntity!]!
   getOnePortfolio(input: IdPortfolioInput!): PortfolioWithTransactionEntity!
+  getTotalProfitPortfolio: FullStatisticEndity!
+  getTotalProfitOneCrypto: ItemStatisticEndity!
   getOneTransaction(input: IdInput!): TransactionEntity!
   getAllTransactionInPortfolio(input: IdInput!): [TransactionEntity!]!
+  calculateTotalProfitChart(input: IdPortfolioInput!): [ChartStateForResult!]!
 }
 
 input LoginAuthInput {

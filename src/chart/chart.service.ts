@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CoinService } from 'src/coin/coin.service';
 import { StatisticsService } from 'src/statistics/statistics.service';
-import { ChartState, ChartStateForResult } from 'src/chart/types/chart-state';
+import { ChartState, ChartStateForResult } from 'src/chart/endity/chart-state';
 import { TransactionEntity } from 'src/transaction/endity/transaction-endity';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { MessageEntity } from 'src/common/global-endity/message.endity';
+import { PortfolioService } from 'src/portfolio/portfolio.service';
 
 @Injectable()
 export class ChartService {
@@ -12,24 +13,38 @@ export class ChartService {
     constructor(
         private readonly transactionService: TransactionService,
         private readonly coinService: CoinService,
-        private readonly statisticsService: StatisticsService
+        private readonly statisticsService: StatisticsService,
+        private readonly portfolioService: PortfolioService
     ) { }
 
-    public async calculateTotalProfitChart(portfolio: number): Promise<ChartStateForResult[] | MessageEntity> {
+    public async checkByOwner(portfolio: number, userId: number): Promise<ChartStateForResult[] | MessageEntity> {
         try {
+            const authorId = await this.portfolioService.getOnePortfolio(portfolio);
+
+            if (userId !== +authorId.id) {
+                throw new ForbiddenException({ message: 'Access denied!' });
+            }
+
+            return this.calculateTotalProfitChart(portfolio);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    private async calculateTotalProfitChart(portfolio: number): Promise<ChartStateForResult[] | MessageEntity> {
+        try {
+
             const transactions = await this.transactionService.getAllTransactionInPortfolio(portfolio);
 
             if (transactions.length === 0) {
-                return { message: 'Transaction not found!' };
+                throw new ForbiddenException({ message: 'Transaction not found!' });
             }
             
-            const sortedCoins = await this.coinService.sortCoin(transactions);
-
-            const uniqueCoins = [...new Set(transactions.map(transaction => transaction.coin))];
+            const sortedCoins = this.coinService.sortCoin(transactions);
 
             const totalChart = await Promise.all(
-                uniqueCoins.map(async (coin) => {
-                    const chart = await this.getStateDaysChartOneCrypto(sortedCoins[coin]);
+                sortedCoins.map(async (coin) => {
+                    const chart = await this.getStateDaysChartOneCrypto(coin);
                     return chart;
                 })
             );

@@ -9,7 +9,6 @@ import { StatisticsModule } from './statistics/statistics.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { CoinModule } from './coin/coin.module';
 import { ChartModule } from './chart/chart.module';
-import { FortestModule } from './fortest/fortest.module';
 
 @Module({
     imports: [
@@ -25,7 +24,6 @@ import { FortestModule } from './fortest/fortest.module';
         TransactionModule,
         CoinModule,
         ChartModule,
-        FortestModule,
     ],
     controllers: [],
     providers: [],

@@ -6,23 +6,26 @@ import axios from 'axios';
 @Injectable()
 export class CoinService {
 
-    public async sortCoin(transactions: TransactionEntity[]) {
+    public sortCoin(transactions: TransactionEntity[]): TransactionEntity[][] {
 
-        const sortedCrypto = {};
-
+        const sortedCrypto: { [crypto: string]: TransactionEntity[] } = {};
+    
         for (let i = 0; i < transactions.length; i++) {
             const transaction = transactions[i];
             const crypto = transaction.coin;
-
+    
             if (!sortedCrypto[crypto]) {
                 sortedCrypto[crypto] = [];
             }
-
+    
             sortedCrypto[crypto].push(transaction);
         }
-
-        return sortedCrypto;
+    
+        const result = Object.values(sortedCrypto);
+    
+        return result;
     }
+    
 
     public async getHistoryPriceOneDay(date: number, coin: string): Promise<number> {
         try {
