@@ -17,8 +17,15 @@ export class StatisticsService {
         private readonly portfolioService: PortfolioService,
     ) {}
 
-    public async getTotalProfitPortfolio(portfolioId: number): Promise<FullStatisticEndity> {
-        try {
+    public async getTotalProfitPortfolio(portfolioId: number, userId: number): Promise<FullStatisticEndity> {
+        try {  
+
+            const checkByOwner = await this.portfolioService.checkByOwner(portfolioId, userId)
+
+            if (!checkByOwner) {
+                throw new ForbiddenException({ message: 'Access denied!' });
+            }
+
             const crypto = await this.prisma.transaction.findMany({
                 where: {  portfolioId: portfolioId }
             })
@@ -27,7 +34,7 @@ export class StatisticsService {
             const uniqueCoinsArray = Array.from(uniqueCoinsSet);
 
             const statePortfolio = await Promise.all(uniqueCoinsArray.map(async (item) => {
-                const result = await this.getTotalProfitOneCrypto(portfolioId, item);
+                const result = await this.getTotalProfitOneCrypto(portfolioId, item, userId);
                 return result;
             }));
 
@@ -56,8 +63,15 @@ export class StatisticsService {
         }
     }
 
-    public async getTotalProfitOneCrypto(portfolioId: number, coin: string): Promise<ItemStatisticEndity> {
+    public async getTotalProfitOneCrypto(portfolioId: number, coin: string, userId: number): Promise<ItemStatisticEndity> {
         try {
+
+            const checkByOwner = await this.portfolioService.checkByOwner(portfolioId, userId)
+
+            if (!checkByOwner) {
+                throw new ForbiddenException({ message: 'Access denied!' });
+            }
+
             const priceToday = await this.coinService.getHistoryPriceOneDay(Date.now(), coin);
 
             const state = { usd: 0, coin: 0 };

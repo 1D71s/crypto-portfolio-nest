@@ -16,14 +16,14 @@ export class StatisticsResolver {
     
     @UseGuards(AuthGuard)
     @Query(() => FullStatisticEndity)
-    getTotalProfitPortfolio(/*@User() user: UserEntity, @Args('input') dto: IdPortfolioInput*/) {
-        return this.statisticsService.getTotalProfitPortfolio(1)
+    getTotalProfitPortfolio(@User() user: UserEntity, @Args('input') dto: IdPortfolioInput) {
+        return this.statisticsService.getTotalProfitPortfolio(dto.id, user.id)
     }
 
     @UseGuards(AuthGuard)
     @Query(() => ItemStatisticEndity)
-    getTotalProfitOneCrypto(/*@User() user: UserEntity, @Args('input') dto: GetProfitOneCryptoDto*/) {
-        return this.statisticsService.getTotalProfitOneCrypto(1, 'WBT')
+    getTotalProfitOneCrypto(@User() user: UserEntity, @Args('input') dto: GetProfitOneCryptoDto) {
+        return this.statisticsService.getTotalProfitOneCrypto(dto.id, dto.coin, user.id)
     }
 
 }

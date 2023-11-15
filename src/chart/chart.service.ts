@@ -17,22 +17,14 @@ export class ChartService {
         private readonly portfolioService: PortfolioService
     ) { }
 
-    public async checkByOwner(portfolio: number, userId: number): Promise<ChartStateForResult[] | MessageEntity> {
+    public async calculateTotalProfitChart(portfolio: number, userId: number): Promise<ChartStateForResult[] | MessageEntity> {
         try {
-            const authorId = await this.portfolioService.getOnePortfolio(portfolio);
+            
+            const checkByOwner = await this.portfolioService.checkByOwner(portfolio, userId)
 
-            if (userId !== +authorId.id) {
+            if (!checkByOwner) {
                 throw new ForbiddenException({ message: 'Access denied!' });
             }
-
-            return this.calculateTotalProfitChart(portfolio);
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    private async calculateTotalProfitChart(portfolio: number): Promise<ChartStateForResult[] | MessageEntity> {
-        try {
 
             const transactions = await this.transactionService.getAllTransactionInPortfolio(portfolio);
 

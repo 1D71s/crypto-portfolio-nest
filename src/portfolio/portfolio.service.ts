@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { CreatePortfolioInput } from './dto/create-portfolio-dto';
@@ -6,6 +6,7 @@ import { UpdatePortfolioInput } from './dto/update-portfolio-dto';
 import { PortfolioEntity } from './endity/portfolio-endity';
 import { PortfolioWithTransactionEntity } from './endity/portfolio-with-transacion-endity';
 import { MessageEntity } from 'src/common/global-endity/message.endity';
+import { ChartStateForResult } from 'src/chart/endity/chart-state-for-result';
 
 
 @Injectable()
@@ -125,6 +126,20 @@ export class PortfolioService {
 
             return { message: 'Portfolio has been deleted!' }
 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async checkByOwner(portfolio: number, userId: number): Promise<boolean> {
+        try {
+            const authorId = await this.getOnePortfolio(portfolio);
+
+            if (userId !== +authorId.id) {
+                return false
+            }
+
+            return true
         } catch (error) {
             throw error;
         }

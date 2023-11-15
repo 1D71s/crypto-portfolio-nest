@@ -15,7 +15,7 @@ export class ChartResolver {
     @UseGuards(AuthGuard)
     @Query(() => [ChartStateForResult])
     calculateTotalProfitChart(@User() user: UserEntity, @Args('input') dto: IdPortfolioInput) {
-        return this.chartService.checkByOwner(dto.id, user.id)
+        return this.chartService.calculateTotalProfitChart(dto.id, user.id)
     }
 
 }

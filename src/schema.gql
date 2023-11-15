@@ -83,8 +83,8 @@ type Query {
   getme: UserEntity!
   getAllUserPortfolio: [PortfolioWithTransactionEntity!]!
   getOnePortfolio(input: IdPortfolioInput!): PortfolioWithTransactionEntity!
-  getTotalProfitPortfolio: FullStatisticEndity!
-  getTotalProfitOneCrypto: ItemStatisticEndity!
+  getTotalProfitPortfolio(input: IdPortfolioInput!): FullStatisticEndity!
+  getTotalProfitOneCrypto(input: GetProfitOneCryptoDto!): ItemStatisticEndity!
   getOneTransaction(input: IdInput!): TransactionEntity!
   getAllTransactionInPortfolio(input: IdInput!): [TransactionEntity!]!
   calculateTotalProfitChart(input: IdPortfolioInput!): [ChartStateForResult!]!
@@ -97,6 +97,11 @@ input LoginAuthInput {
 
 input IdPortfolioInput {
   id: Float!
+}
+
+input GetProfitOneCryptoDto {
+  id: Float!
+  coin: String!
 }
 
 input IdInput {
